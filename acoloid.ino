@@ -1,6 +1,6 @@
 int r = 10;
-int g = 11; 
-int b = 12; 
+int g = 9; 
+int b = 8; 
 
 void setup() { 
 pinMode(r, OUTPUT);
@@ -9,8 +9,8 @@ pinMode(b, OUTPUT);
 }
 
 void loop() {
-analogWrite(r, 155);
-digitalWrite(g, 10);
-digitalWrite(b, 10);
+analogWrite(r, 0);
+analogWrite(g, 255);
+analogWrite(b, 255);
 }
 
