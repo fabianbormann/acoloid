@@ -3,6 +3,6 @@
 
     <string name="app_name">acoloid</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="info_text">Sobald du die Regler änderst, aktualisiert sich die Farbe automatisch.</string>
 
 </resources>
