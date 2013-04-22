@@ -1,11 +1,9 @@
-String values; // contains the RGB values
-int received; // this 
 int r = 10; 
 int g = 9; 
 int b = 8;
-int rValue = 0;
-int gValue = 0;
-int bValue = 0;
+byte rByte = 0;
+byte gByte = 255;
+byte bByte = 255;
 
 void setup() { 
   // define the r,g,b pins as an output 
@@ -21,49 +19,19 @@ void setup() {
 }
 
 void loop() {
-/*
+
   if(Serial.available())
   {
     //read the values if serial is available
-    received = Serial.read(); 
+    rByte = Serial.read();
+    gByte = Serial.read();
+    bByte = Serial.read();
   }
-*/   
-  values = "133;255;12"; // example data
-  
-  // decode the values
-  rValue = getRValue(values);
-  gValue = getGValue(values);
-  bValue = getBValue(values);
-  
+     
   // refresh the led
-  analogWrite(r, rValue);
-  analogWrite(g, gValue);
-  analogWrite(b, bValue);
+  analogWrite(r, rByte);
+  analogWrite(g, gByte);
+  analogWrite(b, bByte);
   
   delay(100);
-}
-
-int getRValue(String s){
-  s = s.substring(0,findDelimiter(s));
-  return s.toInt();
-}
- 
-int getGValue(String s){
-  s = s.substring(findDelimiter(s)+1);
-  s = s.substring(0,findDelimiter(s));
-  return s.toInt();
-} 
-
-int getBValue(String s){
-  s = s.substring(findDelimiter(s)+1);
-  s = s.substring(findDelimiter(s)+1);
-  return s.toInt();
-} 
- 
-int findDelimiter(String s){
-  int pos = 0;
-  while(s.charAt(pos) != ';'){
-    pos++;
-  }
-  return pos;
 }
