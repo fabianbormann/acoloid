@@ -1,45 +1,63 @@
 package com.example.acoloid;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Set;
 
-import android.os.Bundle;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
+
+	BluetoothAdapter btAdapter;
+	Set<BluetoothDevice> pairedDevices;
+	ArrayList<String> btAdapterArray;
 	
-	private BluetoothAdapter bAdapter = null;
-	private OutputStream outColor = null;
+	@Override
+    public void onCreate(Bundle savedInstanceState) {         
+
+       super.onCreate(savedInstanceState);    
+       setContentView(R.layout.activity_main);
+       initBluetooth();
+   }
+
+	private void initBluetooth() {
+		// Check if bluetooth is available on this device
+		btAdapter = BluetoothAdapter.getDefaultAdapter();
+		if (btAdapter == null) {
+		    Toast.makeText(getApplicationContext(), "Nice try but bluetooth is not on your phone...", Toast.LENGTH_SHORT).show();
+		    finish();
+		}
+		// Check if bluetooth is enabled
+		if (!btAdapter.isEnabled()) {
+		    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		    startActivityForResult(intent, 1);
+		}
+		
+		//Search for pairedDevices
+		pairedDevices = btAdapter.getBondedDevices();
+		// if exists
+		if (pairedDevices.size() > 0) {
+		    // add to an array
+		    for (BluetoothDevice device : pairedDevices) {
+		        btAdapterArray.add(device.getName() + "\n" + device.getAddress());
+		    }
+		}
+		
+		Log.i("acoloid", btAdapterArray.get(0));
+		
+	}
 	
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-         
-        bAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        byte[] cBuffer = new byte[3];
-        cBuffer[0] = (byte) 255;
-        cBuffer[1] = (byte) 0;
-        cBuffer[2] = (byte) 255;
-        
-        try{
-          outColor.write(cBuffer);
-        }
-        catch(IOException e){   
-            Log.d("bluetooth", "An error occurred, please try again..");  
-        }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-    
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		   if (resultCode == Activity.RESULT_OK) {
+		      // Bluetooth is enabled.
+		   } else {
+			   Toast.makeText(getApplicationContext(), "Bluetooth must be enabled!", Toast.LENGTH_SHORT).show();
+			   finish();
+		   }
+		}
 }
