@@ -16,6 +16,7 @@ public class MainActivity extends Activity {
 	BluetoothAdapter btAdapter;
 	Set<BluetoothDevice> pairedDevices;
 	ArrayList<String> btAdapterArray;
+	ArrayList<BluetoothDevice> pbtDevices;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {         
@@ -40,15 +41,26 @@ public class MainActivity extends Activity {
 		
 		//Search for pairedDevices
 		pairedDevices = btAdapter.getBondedDevices();
+		btAdapterArray = new ArrayList<String>();
+		pbtDevices = new ArrayList<BluetoothDevice>();
 		// if exists
 		if (pairedDevices.size() > 0) {
 		    // add to an array
 		    for (BluetoothDevice device : pairedDevices) {
 		        btAdapterArray.add(device.getName() + "\n" + device.getAddress());
+		        pbtDevices.add(device);
 		    }
 		}
 		
 		Log.i("acoloid", btAdapterArray.get(0));
+		//Server - tomorrow
+		
+		//Client 
+		ConnectThread cnThread = new ConnectThread(pbtDevices.get(0), btAdapter);
+		
+		Log.i("acoloid", "Everything is fine");
+		//Send Message - soon
+		
 		
 	}
 	
@@ -60,4 +72,5 @@ public class MainActivity extends Activity {
 			   finish();
 		   }
 		}
+	
 }
