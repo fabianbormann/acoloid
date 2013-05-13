@@ -50,18 +50,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 	private void configureColorPicker() {
 		//init
 		cpicker = (ColorPickerView)findViewById(R.id.colorPickerView1);
-
-		/*redBar =(SeekBar)findViewById(R.id.seekBar1);
-		greenBar =(SeekBar)findViewById(R.id.seekBar2);
-		blueBar =(SeekBar)findViewById(R.id.seekBar3);*/
-		//set maximum
-		/*redBar.setMax(255);
-		greenBar.setMax(255);
-		blueBar.setMax(255);
-		//set the ChangeListener
-		redBar.setOnSeekBarChangeListener(this);
-		greenBar.setOnSeekBarChangeListener(this);
-		blueBar.setOnSeekBarChangeListener(this);*/
 	}
 
 	private void initBluetooth() {
