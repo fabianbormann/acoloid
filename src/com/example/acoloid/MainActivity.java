@@ -6,13 +6,18 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -26,36 +31,37 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 	private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	ConnectedThread conThread;
 	
-	//seekbars
-	SeekBar redBar;
-	SeekBar greenBar;
-	SeekBar blueBar;
+	//Color Picker
+	ColorPickerView cpicker;
 	
 	//color in a byte array
 	byte[] b = new byte[3];
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {         
-
-       super.onCreate(savedInstanceState);    
+       super.onCreate(savedInstanceState);  
+    
        setContentView(R.layout.activity_main);
-       initBluetooth();
-       configureSeekbars();
+       //initBluetooth();
+       configureColorPicker();
    }
 
-	private void configureSeekbars() {
+	@SuppressLint("NewApi")
+	private void configureColorPicker() {
 		//init
-		redBar =(SeekBar)findViewById(R.id.seekBar1);
+		cpicker = (ColorPickerView)findViewById(R.id.colorPickerView1);
+
+		/*redBar =(SeekBar)findViewById(R.id.seekBar1);
 		greenBar =(SeekBar)findViewById(R.id.seekBar2);
-		blueBar =(SeekBar)findViewById(R.id.seekBar3);
+		blueBar =(SeekBar)findViewById(R.id.seekBar3);*/
 		//set maximum
-		redBar.setMax(255);
+		/*redBar.setMax(255);
 		greenBar.setMax(255);
 		blueBar.setMax(255);
 		//set the ChangeListener
 		redBar.setOnSeekBarChangeListener(this);
 		greenBar.setOnSeekBarChangeListener(this);
-		blueBar.setOnSeekBarChangeListener(this);
+		blueBar.setOnSeekBarChangeListener(this);*/
 	}
 
 	private void initBluetooth() {
@@ -204,7 +210,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
 	@Override
 	public void onProgressChanged(SeekBar seekbar, int progress, boolean arg2) {
-	    switch (seekbar.getId()) {
+	   /* switch (seekbar.getId()) {
 	    case R.id.seekBar1:
 	    	if(conThread != null){
 	    		b[0] = (byte) progress;
@@ -232,7 +238,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 	    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
 	    	}
 	    	break;
-	    }
+	    }*/
 	}
 
 	@Override

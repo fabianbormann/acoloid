@@ -14,28 +14,17 @@
         android:layout_height="wrap_content"
         android:text="@string/info_text" />
 
-    <SeekBar
-        android:id="@+id/seekBar1"
-        android:layout_width="match_parent"
+    <com.example.acoloid.ColorPickerView
+        android:id="@+id/colorPickerView1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/seekBar2"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="50dp" />
+        android:layout_marginTop="10dip"
+        android:layout_below="@id/textView1" />
 
-    <SeekBar
-        android:id="@+id/seekBar3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/seekBar2"
-        android:layout_marginTop="35dp" />
-
-    <SeekBar
-        android:id="@+id/seekBar2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/seekBar3"
-        android:layout_below="@+id/seekBar1"
-        android:layout_marginTop="35dp" />
-
+	<Spinner
+	    android:id="@+id/spinner1"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignLeft="@+id/colorPickerView1"
+	    android:layout_below="@+id/colorPickerView1" />
 </RelativeLayout>
