@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -13,15 +14,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
-import android.widget.ImageView;
-import android.widget.SeekBar;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
+public class MainActivity extends Activity {
 	
 	//variables for bluetooth connection
 	BluetoothAdapter btAdapter;
@@ -42,16 +41,42 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
        super.onCreate(savedInstanceState);  
     
        setContentView(R.layout.activity_main);
-       //initBluetooth();
-       configureColorPicker();
+       initBluetooth();
+       setUp();
    }
 
 	@SuppressLint("NewApi")
-	private void configureColorPicker() {
+	private void setUp() {
 		//init
 		cpicker = (ColorPickerView)findViewById(R.id.colorPickerView1);
-	}
+		cpicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
 
+			@Override
+			public void onColorChanged(int color) {
+				if(conThread != null){
+					b[0] = (byte) Color.red(color);
+					b[1] = (byte) Color.green(color);
+					b[2] = (byte) Color.blue(color);
+		    		conThread.write(b);
+		    	}
+		    	else{
+		    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
+		    	}
+			}
+		});
+		
+		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
+		
+		String[] spinnerElements= new String[2];
+		spinnerElements[0]="LED 1";
+		spinnerElements[1]="LED 2";
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		android.R.layout.simple_spinner_dropdown_item, spinnerElements);
+		spinner.setAdapter(adapter);
+		
+	}
+	
 	private void initBluetooth() {
 		// Check if bluetooth is available on this device
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -195,50 +220,4 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 	        } catch (IOException e) { }
 	    }
 	}
-
-	@Override
-	public void onProgressChanged(SeekBar seekbar, int progress, boolean arg2) {
-	   /* switch (seekbar.getId()) {
-	    case R.id.seekBar1:
-	    	if(conThread != null){
-	    		b[0] = (byte) progress;
-	    		conThread.write(b);
-	    	}
-	    	else{
-	    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
-	    	}
-	    	break;
-	    case R.id.seekBar2:
-	    	if(conThread != null){
-	    		b[1] = (byte) progress;
-	    		conThread.write(b);
-	    	}
-	    	else{
-	    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
-	    	}
-	    	break;
-	    case R.id.seekBar3:
-	    	if(conThread != null){
-	    		b[2] = (byte) progress;
-	    		conThread.write(b);
-	    	}
-	    	else{
-	    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
-	    	}
-	    	break;
-	    }*/
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }

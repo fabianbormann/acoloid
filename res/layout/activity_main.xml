@@ -8,23 +8,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/info_text" />
+	<com.example.acoloid.ColorPickerView
+	    android:id="@+id/colorPickerView1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignLeft="@+id/spinner1"
+	    android:layout_centerVertical="true" />
 
-    <com.example.acoloid.ColorPickerView
-        android:id="@+id/colorPickerView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:layout_below="@id/textView1" />
+	<TextView
+	    android:id="@+id/textView1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/spinner1"
+	    android:layout_alignParentRight="true"
+	    android:text="@string/info_text" />
 
 	<Spinner
 	    android:id="@+id/spinner1"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:layout_alignLeft="@+id/colorPickerView1"
-	    android:layout_below="@+id/colorPickerView1" />
+	    android:layout_above="@+id/colorPickerView1"
+	    android:layout_alignParentRight="true" />
 </RelativeLayout>
