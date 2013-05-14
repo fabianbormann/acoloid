@@ -6,8 +6,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -30,34 +28,36 @@ public class MainActivity extends Activity {
 	private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	ConnectedThread conThread;
 	
-	//Color Picker
-	ColorPickerView cpicker;
-	
-	//color in a byte array
-	byte[] b = new byte[3];
+	ColorPickerView colorPicker;
+	byte[] rgbBytes = new byte[3];
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {         
        super.onCreate(savedInstanceState);  
-    
        setContentView(R.layout.activity_main);
+       
        initBluetooth();
-       setUp();
+       setUpColorPicker();
    }
 
-	@SuppressLint("NewApi")
-	private void setUp() {
-		//init
-		cpicker = (ColorPickerView)findViewById(R.id.colorPickerView1);
-		cpicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
-
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		if(conThread != null){
+			conThread.cancel();
+		}
+	}
+	
+	private void setUpColorPicker() {
+		colorPicker = (ColorPickerView)findViewById(R.id.colorPickerView1);
+		colorPicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
 			@Override
 			public void onColorChanged(int color) {
 				if(conThread != null){
-					b[0] = (byte) Color.red(color);
-					b[1] = (byte) Color.green(color);
-					b[2] = (byte) Color.blue(color);
-		    		conThread.write(b);
+					rgbBytes[0] = (byte) Color.red(color);
+					rgbBytes[1] = (byte) Color.green(color);
+					rgbBytes[2] = (byte) Color.blue(color);
+		    		conThread.write(rgbBytes);
 		    	}
 		    	else{
 		    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
@@ -104,8 +104,6 @@ public class MainActivity extends Activity {
 		}
 		
 		Log.i("acoloid", btAdapterArray.get(0));
-		
-		//Start discovery (optional)
 		
 		//Connect to a remote Device
 		ConnectThread cThread = new ConnectThread(pbtDevices.get(0));
