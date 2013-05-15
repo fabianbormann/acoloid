@@ -14,7 +14,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -35,6 +37,18 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {         
        super.onCreate(savedInstanceState);  
        setContentView(R.layout.activity_main);
+       
+       Button handshake = (Button) findViewById(R.id.button1);
+       
+       handshake.setOnClickListener(new View.OnClickListener() {
+           public void onClick(View v) {
+        	   if(conThread != null){
+        		   	byte[] handshake = new byte[1];
+        		   	handshake[0] = 42;
+		    		conThread.write(handshake);
+		    	}
+           }
+       });
        
        initBluetooth();
        setUpColorPicker();
@@ -197,6 +211,7 @@ public class MainActivity extends Activity {
 	            try {
 	                // Read from the InputStream
 	                bytes = mmInStream.read(buffer);
+	                Log.i("acoloid", "detected action: "+bytes);
 	                // Send the obtained bytes to the UI activity
 	            } catch (IOException e) {
 	                break;
