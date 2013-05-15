@@ -1,3 +1,5 @@
+const int VALID_HANDSHAKE_VALUE = 42;
+
 int red1 = 11; 
 int green1 = 10; 
 int blue1 = 9;
@@ -73,7 +75,7 @@ void loop() {
 }
 
 /**
-  * This function waits for signal from android phone equals (42)
+  * This function waits for vaild signal from android phone
   * and sends the value of LEDs which are connected with this arduino
   */
 void waitForHandshake(){
@@ -83,7 +85,7 @@ void waitForHandshake(){
       
       handshakeValue = Serial.read();
       
-      if(handshakeValue == 42){
+      if(handshakeValue == VALID_HANDSHAKE_VALUE){
         //change led 1,2 to green
         analogWrite(red1, 0);
         analogWrite(green1, 255);
