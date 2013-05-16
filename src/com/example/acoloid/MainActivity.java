@@ -16,9 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -27,16 +25,20 @@ public class MainActivity extends Activity {
 	private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	private static final int MESSAGE_READ = 1;
 	protected static final byte[] HANDSHAKE = {42};
-	private final Handler mHandler = new Handler(){
+	protected static final byte[] CODE_WAITING_MODE = {99,98,97,99};
+	
+	private final Handler mHandler = new Handler(new Handler.Callback(){
 	      @Override
-	      public void handleMessage(Message msg) {
+	      public boolean handleMessage(Message msg) {
 	    	  byte[] readMessage = (byte[]) msg.obj;
 	          if (msg.arg1 > 0) {
 	        	  countOfLEDs = readMessage[0];
 	        	  fillComboboxWithItems();
+	        	  return true;
 	          }
+			return false;
 	      }
-	};
+	});
 
 	//variables for bluetooth connection
 	BluetoothAdapter btAdapter;
@@ -46,40 +48,38 @@ public class MainActivity extends Activity {
 	ConnectedThread conThread;
 	
 	ColorPickerView colorPicker;
-	byte[] rgbBytes = new byte[3];
+	byte[] sentBytes = new byte[4];
 	int countOfLEDs = 0;
+	Spinner spinner;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {         
        super.onCreate(savedInstanceState);  
        setContentView(R.layout.activity_main);
-       
-       Button handshake = (Button) findViewById(R.id.button1);
-       
-       handshake.setOnClickListener(new View.OnClickListener() {
-           public void onClick(View v) {
-        	   if(conThread != null){
-        		   	byte[] handshake = new byte[1];
-        		   	handshake[0] = 42;
-		    		conThread.write(HANDSHAKE);
-		    	}
-           }
-       });
-       
+      
        initBluetooth();
        setUpColorPicker();
    }
 
 	@Override
 	public void onDestroy(){
-		super.onDestroy();
+		setArduinoInWaitingMode();
+		
 		if(conThread != null){
 			conThread.cancel();
+		}
+		
+		super.onDestroy();
+	}
+	
+	private void setArduinoInWaitingMode(){
+		if(conThread != null){
+			conThread.write(CODE_WAITING_MODE);
 		}
 	}
 	
 	private void fillComboboxWithItems() {
-		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
+		spinner = (Spinner) findViewById(R.id.spinner1);
 		
 		String[] spinnerElements= new String[countOfLEDs];
 		for(int i = 0; i < countOfLEDs; i++){
@@ -97,10 +97,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onColorChanged(int color) {
 				if(conThread != null){
-					rgbBytes[0] = (byte) Color.red(color);
-					rgbBytes[1] = (byte) Color.green(color);
-					rgbBytes[2] = (byte) Color.blue(color);
-		    		conThread.write(rgbBytes);
+					sentBytes[0] = (byte) Color.red(color);
+					sentBytes[1] = (byte) Color.green(color);
+					sentBytes[2] = (byte) Color.blue(color);
+					sentBytes[3] = (byte) (spinner.getSelectedItemPosition()+1);
+		    		conThread.write(sentBytes);
 		    	}
 		    	else{
 		    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
@@ -153,13 +154,11 @@ public class MainActivity extends Activity {
 	
 	private class ConnectThread extends Thread {
 	    private final BluetoothSocket mmSocket;
-	    private final BluetoothDevice mmDevice;
-	 
+
 	    public ConnectThread(BluetoothDevice device) {
 	        // Use a temporary object that is later assigned to mmSocket,
 	        // because mmSocket is final
 	        BluetoothSocket tmp = null;
-	        mmDevice = device;
 	 
 	        // Get a BluetoothSocket to connect with the given BluetoothDevice
 	        try {
@@ -189,14 +188,8 @@ public class MainActivity extends Activity {
 	        }
 	 
 	        conThread = new ConnectedThread(mmSocket);
+	        conThread.sendHandshake();
 	        conThread.run();
-	    }
-	 
-	    /** Will cancel an in-progress connection, and close the socket */
-	    public void cancel() {
-	        try {
-	            mmSocket.close();
-	        } catch (IOException e) { }
 	    }
 	}
 	 
@@ -221,6 +214,10 @@ public class MainActivity extends Activity {
 	        mmOutStream = tmpOut;
 	    }
 	 
+	    public void sendHandshake(){
+	    	this.write(HANDSHAKE);
+	    }
+	    
 	    public void run() {
 	        byte[] buffer = new byte[1024];  // buffer store for the stream
 	        int bytes; // bytes returned from read()
