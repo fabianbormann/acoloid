@@ -13,6 +13,8 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -22,16 +24,30 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
+	private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+	private static final int MESSAGE_READ = 1;
+	protected static final byte[] HANDSHAKE = {42};
+	private final Handler mHandler = new Handler(){
+	      @Override
+	      public void handleMessage(Message msg) {
+	    	  byte[] readMessage = (byte[]) msg.obj;
+	          if (msg.arg1 > 0) {
+	        	  countOfLEDs = readMessage[0];
+	        	  fillComboboxWithItems();
+	          }
+	      }
+	};
+
 	//variables for bluetooth connection
 	BluetoothAdapter btAdapter;
 	Set<BluetoothDevice> pairedDevices;
 	ArrayList<String> btAdapterArray;
 	ArrayList<BluetoothDevice> pbtDevices;
-	private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	ConnectedThread conThread;
 	
 	ColorPickerView colorPicker;
 	byte[] rgbBytes = new byte[3];
+	int countOfLEDs = 0;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {         
@@ -45,7 +61,7 @@ public class MainActivity extends Activity {
         	   if(conThread != null){
         		   	byte[] handshake = new byte[1];
         		   	handshake[0] = 42;
-		    		conThread.write(handshake);
+		    		conThread.write(HANDSHAKE);
 		    	}
            }
        });
@@ -60,6 +76,19 @@ public class MainActivity extends Activity {
 		if(conThread != null){
 			conThread.cancel();
 		}
+	}
+	
+	private void fillComboboxWithItems() {
+		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
+		
+		String[] spinnerElements= new String[countOfLEDs];
+		for(int i = 0; i < countOfLEDs; i++){
+			spinnerElements[i]="LED "+Integer.toString(i+1);
+		}
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		android.R.layout.simple_spinner_dropdown_item, spinnerElements);
+		spinner.setAdapter(adapter);	
 	}
 	
 	private void setUpColorPicker() {
@@ -77,18 +106,7 @@ public class MainActivity extends Activity {
 		    		Toast.makeText(getApplicationContext(), "The connection is not established yet", Toast.LENGTH_LONG).show();
 		    	}
 			}
-		});
-		
-		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
-		
-		String[] spinnerElements= new String[2];
-		spinnerElements[0]="LED 1";
-		spinnerElements[1]="LED 2";
-
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-		android.R.layout.simple_spinner_dropdown_item, spinnerElements);
-		spinner.setAdapter(adapter);
-		
+		});	
 	}
 	
 	private void initBluetooth() {
@@ -171,6 +189,7 @@ public class MainActivity extends Activity {
 	        }
 	 
 	        conThread = new ConnectedThread(mmSocket);
+	        conThread.run();
 	    }
 	 
 	    /** Will cancel an in-progress connection, and close the socket */
@@ -182,7 +201,7 @@ public class MainActivity extends Activity {
 	}
 	 
 	private class ConnectedThread extends Thread {
-	    private final BluetoothSocket mmSocket;
+		private final BluetoothSocket mmSocket;
 	    private final InputStream mmInStream;
 	    private final OutputStream mmOutStream;
 	 
@@ -213,6 +232,8 @@ public class MainActivity extends Activity {
 	                bytes = mmInStream.read(buffer);
 	                Log.i("acoloid", "detected action: "+bytes);
 	                // Send the obtained bytes to the UI activity
+	                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+	                        .sendToTarget();
 	            } catch (IOException e) {
 	                break;
 	            }
