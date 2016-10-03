@@ -1,5 +1,7 @@
 # acoloid
 
+<img src="https://github.com/fabianbormann/acoloid/blob/master/acoloid.png" width="500" />
+
 Hey there! 
 Welcome to my first public project! The goal of this project is to create a 
 selfmade Arduino (Breadboard Arduino) with an RGB LED on a small laboratory pcb.
